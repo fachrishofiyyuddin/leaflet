@@ -1,80 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
+    <title>Peta Kampus</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Interaktif dengan AJAX dan Leaflet.js</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <style>
-        #map {
-            height: 600px;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-    <div id="map"></div>
+    <div id="preloader">
+        <h4>Mohon ditunggu, sedang memuat...</h4>
+    </div>
 
+    <div class="container">
+        <h3>Tampilan Demo Interaktif: Pemetaan Maps dengan Leaflet dan Data JSON dari MySQLi menggunakan PHP</h3>
+        <hr>
+        <div id="map" style="display: none;"></div>
+
+        <!-- Modal untuk menampilkan informasi area -->
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title" id="modalTitle"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Tabel untuk menampilkan lat dan lng -->
+                        <h4><i>Data Koordinat</i></h4>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coordinateTableBody">
+                                <!-- Data akan dimasukkan ke sini oleh JavaScript -->
+                            </tbody>
+                        </table>
+
+                        <p>Informasi lain tentang <span id="areaName"></span></p>
+                        <p><b>Jumlah mahasiswa: </b><span id="studentCount"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script>
-        // Inisialisasi peta Leaflet dengan pusat di Semarang
-        var map = L.map('map').setView([-7.090911, 110.398804], 12);
-
-        // Menambahkan tile layer OpenStreetMap sebagai base layer peta
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        // AJAX untuk mengambil data dari API
-        $.ajax({
-            url: 'api.php', // Ganti dengan URL API yang sesuai
-            type: 'GET',
-            success: function(data) {
-                // Menambahkan layer GeoJSON ke peta
-                for (var i = 0; i < data.length; i++) {
-                    var name = data[i].name;
-                    var coordinates = data[i].coordinates;
-                    var randomColor = getRandomColor();
-
-                    // Membuat polygon untuk wilayah
-                    var polygon = L.polygon(coordinates, {
-                        color: randomColor,
-                        fillOpacity: 0.7
-                    }).addTo(map);
-                    polygon.bindPopup(name);
-
-                    // Menambahkan marker di tengah polygon (dengan ikon default Leaflet)
-                    var center = getPolygonCenter(coordinates);
-                    var marker = L.marker(center).addTo(map);
-                    marker.bindPopup(name);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Gagal mengambil data: ' + status + ', ' + error);
-            }
-        });
-
-        // Fungsi untuk menghasilkan warna acak
-        function getRandomColor() {
-            var letters = '0123456789ABCDEF';
-            var color = '#';
-            for (var i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
-        }
-
-        // Fungsi untuk mendapatkan titik tengah polygon
-        function getPolygonCenter(coords) {
-            var bounds = new L.LatLngBounds(coords);
-            return bounds.getCenter();
-        }
-    </script>
-
+    <!-- leaflet -->
+    <script src="assets/js/index.js"></script>
 </body>
 
 </html>

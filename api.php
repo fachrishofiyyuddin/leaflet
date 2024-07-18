@@ -2,27 +2,37 @@
 // ambil koneksi dari folder koneksi
 include "koneksi/index.php";
 
-// Query untuk mengambil data dari tabel geojson_data
-$sql = "SELECT name, coordinates FROM geojson_data";
+header('Content-Type: application/json');
+
+// Query SQL untuk mengambil data koordinat dan mengelompokkannya berdasarkan id_area
+$sql = "SELECT coordinates.id_area, areas.name, students.jumlah, GROUP_CONCAT( CONCAT( coordinates.lat, ',', coordinates.lng ) SEPARATOR ';' ) AS coordinates FROM coordinates JOIN areas ON coordinates.id_area = areas.id JOIN students ON students.id_area = areas.id GROUP BY coordinates.id_area";
 $result = $conn->query($sql);
 
-// Array untuk menyimpan data koordinat
-$features = array();
-
 if ($result->num_rows > 0) {
+    // Inisialisasi array untuk menyimpan data koordinat
+    $coordinates = array();
+
+    // Loop melalui setiap baris hasil query
     while ($row = $result->fetch_assoc()) {
-        $name = $row['name'];
-        $coordinates = json_decode($row['coordinates'], true);
-        $feature = array(
-            "name" => $name,
-            "coordinates" => $coordinates
+        // Explode coordinates menjadi array koordinat yang terpisah
+        $coords = array_map(function ($coord) {
+            return explode(',', $coord);
+        }, explode(';', $row['coordinates']));
+
+        // Tambahkan data koordinat dan nama area ke dalam array
+        $coordinates[$row['id_area']] = array(
+            'name' => $row['name'],
+            'jumlah' => $row['jumlah'],
+            'coords' => $coords
         );
-        array_push($features, $feature);
     }
+
+    // Mengirimkan data sebagai JSON
+    echo json_encode($coordinates);
+} else {
+    echo json_encode(array()); // Jika tidak ada hasil, kirimkan array kosong
 }
 
-$conn->close();
 
-// Mengirimkan data dalam format JSON
-header('Content-Type: application/json');
-echo json_encode($features);
+// Tutup koneksi database
+$conn->close();
